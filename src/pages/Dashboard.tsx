@@ -95,7 +95,14 @@ export default function Dashboard() {
       const data: Submission[] = await res.json();
       setSubmissions(mergeSubmissions(data, localReports));
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Failed to load history');
+      const localReports = getLocalReports();
+      setSubmissions(mergeSubmissions([], localReports));
+
+      if (localReports.length === 0) {
+        console.warn('Dashboard history unavailable:', err);
+      } else {
+        setError(null);
+      }
     } finally {
       setLoading(false);
     }
