@@ -114,7 +114,16 @@ export default function Login() {
           </div>
 
           <button
-            onClick={() => signInWithGoogle('SafeStart AI')}
+            onClick={async () => {
+              setError(null);
+              setLoading(true);
+              try {
+                await signInWithGoogle();
+              } catch (err: unknown) {
+                setError(err instanceof Error ? err.message : 'Google sign-in failed');
+                setLoading(false);
+              }
+            }}
             disabled={!isSupabaseConfigured}
             className="w-full bg-[var(--bg)] border border-[var(--border)] hover:bg-[var(--surface-2)] text-[var(--text)] font-semibold py-2.5 rounded-xl transition-colors flex items-center justify-center gap-2"
           >

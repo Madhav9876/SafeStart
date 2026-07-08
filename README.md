@@ -9,7 +9,7 @@ A modern, full-stack web application built with **React** and **Vite** on the fr
 - **Fast Development**: Vite + React for rapid development and hot module reloading
 - **Serverless Backend**: Vercel Functions for scalable, event-driven API routes
 - **Secure Storage**: Supabase-backed database for report storage and resource data
-- **Built-in Authentication**: Google OAuth integration with secure proxy
+- **Built-in Authentication**: Supabase Auth with Google OAuth support
 - **Type-Safe**: Full TypeScript support across frontend and backend
 - **Production-Ready**: Optimized build pipeline with ESLint and type checking
 
@@ -40,8 +40,6 @@ These are prefixed with `VITE_` and are accessible in the browser:
 ```env
 VITE_SUPABASE_URL=your_supabase_project_url
 VITE_SUPABASE_PUBLISHABLE_KEY=your_supabase_anon_key
-VITE_GOOGLE_CLIENT_ID=your_google_client_id
-VITE_GOOGLE_AUTH_PROXY=your_proxy_url
 ```
 
 ### Backend Variables (Server-Only)
@@ -145,6 +143,23 @@ This starts both the Vite dev server and local Vercel Functions at `http://local
 
 ### Post-Deployment
 If any secrets were previously committed or accidentally shared, **rotate them immediately** before making the repository public.
+
+### Google OAuth Setup
+
+Do not put the Google client secret in `.env.local`, Vercel, or any `VITE_*` variable. Configure it in Supabase instead:
+
+1. In Google Cloud Console, add this Authorized redirect URI:
+   ```text
+   https://YOUR_SUPABASE_PROJECT_REF.supabase.co/auth/v1/callback
+   ```
+2. In Supabase, go to Authentication -> Providers -> Google.
+3. Enable Google and paste the Google Client ID and Client Secret there.
+4. In Supabase Authentication -> URL Configuration, set Site URL to your Vercel URL.
+5. Add Redirect URLs for your deployed and local app:
+   ```text
+   https://your-vercel-domain.vercel.app/dashboard
+   http://localhost:5173/dashboard
+   ```
 
 ---
 
