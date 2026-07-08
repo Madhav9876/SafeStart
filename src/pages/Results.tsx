@@ -95,8 +95,21 @@ export default function Results() {
   const handleDownloadPdf = async () => {
     if (!reportRef.current) return;
     setPdfLoading(true);
+
+    const container = document.createElement('div');
     try {
       const html2pdf = (await import('html2pdf.js')).default;
+      const reportClone = reportRef.current.cloneNode(true) as HTMLElement;
+
+      container.style.position = 'fixed';
+      container.style.left = '-10000px';
+      container.style.top = '0';
+      container.style.width = '1100px';
+      container.style.background = 'white';
+      container.style.pointerEvents = 'none';
+      container.appendChild(reportClone);
+      document.body.appendChild(container);
+
       const opt = {
         margin: [0.5, 0.5, 0.5, 0.5] as [number, number, number, number],
         filename: `SafeStart-AI-Report-${id}.pdf`,
@@ -104,11 +117,12 @@ export default function Results() {
         html2canvas: { scale: 2, useCORS: true, logging: false },
         jsPDF: { unit: 'in' as const, format: 'letter' as const, orientation: 'portrait' as const },
       };
-      await html2pdf().set(opt).from(reportRef.current).save();
+      await html2pdf().set(opt).from(reportClone).save();
     } catch (err) {
-      console.warn('html2pdf failed, falling back to browser print:', err);
-      window.print();
+      console.error('PDF generation failed:', err);
+      alert('Sorry, the PDF could not be generated. Please try again.');
     } finally {
+      container.remove();
       setPdfLoading(false);
     }
   };
