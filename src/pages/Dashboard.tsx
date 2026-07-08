@@ -40,6 +40,29 @@ const productTypeLabels: Record<string, string> = {
   provider: 'Open-source/API Provider',
 };
 
+function enrichSubmission(sub: Submission): EnrichedSubmission {
+  const scores = calculateScores(sub.product_type, sub.answers);
+  const overallScore = getOverallScore(scores);
+  return {
+    ...sub,
+    scores,
+    overallScore,
+    maturityLabel: getMaturityLabel(overallScore),
+  };
+}
+
+function mergeSubmissions(serverReports: Submission[], localReports: Submission[]): EnrichedSubmission[] {
+  const reportsById = new Map<string, Submission>();
+
+  [...serverReports, ...localReports].forEach((report) => {
+    reportsById.set(report.id, report);
+  });
+
+  return [...reportsById.values()]
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    .map(enrichSubmission);
+}
+
 export default function Dashboard() {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
@@ -53,19 +76,10 @@ export default function Dashboard() {
     setLoading(true);
     setError(null);
     try {
+      const localReports = getLocalReports();
+
       if (!supabase) {
-        const localReports = getLocalReports();
-        const enriched = localReports.map((sub) => {
-          const scores = calculateScores(sub.product_type, sub.answers);
-          const overallScore = getOverallScore(scores);
-          return {
-            ...sub,
-            scores,
-            overallScore,
-            maturityLabel: getMaturityLabel(overallScore),
-          };
-        });
-        setSubmissions(enriched);
+        setSubmissions(mergeSubmissions([], localReports));
         return;
       }
 
@@ -79,17 +93,7 @@ export default function Dashboard() {
       if (!res.ok) throw new Error('Failed to load history');
 
       const data: Submission[] = await res.json();
-      const enriched = data.map((sub) => {
-        const scores = calculateScores(sub.product_type, sub.answers);
-        const overallScore = getOverallScore(scores);
-        return {
-          ...sub,
-          scores,
-          overallScore,
-          maturityLabel: getMaturityLabel(overallScore),
-        };
-      });
-      setSubmissions(enriched);
+      setSubmissions(mergeSubmissions(data, localReports));
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to load history');
     } finally {
