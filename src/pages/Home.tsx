@@ -57,6 +57,33 @@ const dimensions = [
   { icon: Shield, label: 'User Safety & Transparency' },
 ];
 
+const faqs = [
+  {
+    question: 'Who is SafeStart for?',
+    answer: 'SafeStart is built for founders, product teams, and early compliance leads at startups building or using AI features.',
+  },
+  {
+    question: 'How long does the quiz take?',
+    answer: 'Most teams can complete it in about 10 minutes. The questions are tailored to the AI product type you choose.',
+  },
+  {
+    question: 'Do I need to create an account?',
+    answer: 'No. You can take the quiz without signing in. Creating an account lets you save reports and view them later from your dashboard.',
+  },
+  {
+    question: 'Is this legal or compliance advice?',
+    answer: 'No. SafeStart is an educational self-assessment tool. It helps you spot gaps and prepare better questions for legal, security, and compliance experts.',
+  },
+  {
+    question: 'What happens to my answers?',
+    answer: 'If you are signed in, your report history can be saved to your account. If you continue without signing in, reports are stored only in your browser.',
+  },
+  {
+    question: 'Can I share the report with my team or investors?',
+    answer: 'Yes. You can download a PDF report with your scores, top risk areas, and prioritized action items.',
+  },
+];
+
 export default function Home() {
   return (
     <div className="min-h-screen bg-[var(--bg)] transition-colors overflow-x-hidden">
@@ -244,6 +271,44 @@ export default function Home() {
                 <h3 className="font-serif font-bold text-xl text-[var(--text)] mb-2">{f.title}</h3>
                 <p className="text-[var(--text-muted)] text-sm leading-relaxed">{f.description}</p>
               </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="py-24 bg-[var(--bg)] transition-colors">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-2xl mx-auto mb-12">
+            <span className="text-[var(--primary)] font-semibold text-sm uppercase tracking-wider">FAQ</span>
+            <h2 className="text-4xl md:text-5xl font-serif font-bold text-[var(--text)] mt-2 mb-5">
+              Common questions
+            </h2>
+            <p className="text-[var(--text-muted)]">
+              A few practical answers before you start the assessment.
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            {faqs.map((faq, i) => (
+              <motion.details
+                key={faq.question}
+                initial={{ opacity: 0, y: 12 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.04 }}
+                className="group bg-[var(--surface)] border border-[var(--border)] rounded-2xl p-5 open:border-[var(--primary)]/40 transition-colors"
+              >
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-left font-serif text-lg font-bold text-[var(--text)]">
+                  <span>{faq.question}</span>
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--surface-2)] text-[var(--primary)] transition-transform group-open:rotate-45">
+                    +
+                  </span>
+                </summary>
+                <p className="mt-4 text-[var(--text-muted)] leading-relaxed">
+                  {faq.answer}
+                </p>
+              </motion.details>
             ))}
           </div>
         </div>
